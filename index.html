@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Simulação interativa de infraestrutura de telecomunicações: visita virtual 3D a uma estação rádio-base." />
+    <title>Estação Rádio-Base — Visita Virtual 3D</title>
+    <!-- favicon embutido: evita requisição 404 sem criar arquivo extra -->
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d131b'/%3E%3Cpath d='M16 5l6 22h-3l-1-4h-4l-1 4h-3zm0 7l-1.5 7h3z' fill='%23f0b429'/%3E%3C/svg%3E" />
+  </head>
+  <body>
+    <canvas id="scene" tabindex="0" aria-label="Cena 3D da estação rádio-base"></canvas>
+
+    <div id="loading" class="screen" role="status">
+      <p>Montando a estação…</p>
+    </div>
+
+    <!-- Tela inicial -->
+    <main id="start" class="screen" hidden>
+      <div class="start-card">
+        <p class="eyebrow">Simulação interativa de infraestrutura de telecomunicações</p>
+        <h1>Estação Rádio-Base — Visita Virtual 3D</h1>
+        <p class="lead">Caminhe pela estação, inspecione os equipamentos de perto ou acompanhe uma apresentação guiada.</p>
+        <div class="start-actions">
+          <button id="btn-visit" class="primary" type="button">Iniciar visita</button>
+          <button id="btn-inspect" type="button">Inspeção técnica</button>
+          <button id="btn-tour" type="button">Apresentação guiada</button>
+        </div>
+        <p class="keys-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> ou setas para andar · mouse para olhar · <kbd>E</kbd> para interagir</p>
+        <p class="disclaimer">
+          Simulação visual a partir de uma imagem de referência. Posições e dimensões são estimativas, exceto a altura
+          indicada de 30 m da torre. Não é projeto executivo de engenharia.
+        </p>
+      </div>
+    </main>
+
+    <!-- Interface durante a experiência -->
+    <header id="hud" hidden>
+      <div class="hud-left">
+        <span class="brand">ERB · Visita Virtual 3D</span>
+        <span id="mode-name" class="mode-name" aria-live="polite"></span>
+      </div>
+      <nav class="modes" aria-label="Modo de visualização">
+        <button type="button" data-mode="visit" aria-pressed="false" title="Visita imersiva (1)">Visita</button>
+        <button type="button" data-mode="inspect" aria-pressed="false" title="Inspeção técnica (2)">Inspeção</button>
+        <button type="button" data-mode="tour" aria-pressed="false" title="Apresentação guiada (3)">Guiada</button>
+      </nav>
+      <div class="hud-right">
+        <button id="btn-menu" type="button" title="Voltar à tela inicial (M)">Menu</button>
+        <button id="btn-home" type="button" title="Reiniciar a posição ou a vista do modo atual (R)">Reiniciar vista</button>
+        <button id="btn-settings" type="button" aria-expanded="false" aria-controls="settings" title="Qualidade, sol e modo noturno">Ajustes</button>
+        <button id="btn-fs" type="button" title="Tela cheia (F)">Tela cheia</button>
+        <button id="btn-help" type="button" title="Ajuda com os comandos (?)">Ajuda</button>
+        <button id="btn-hide" type="button" title="Ocultar interface (H)">Ocultar</button>
+      </div>
+    </header>
+
+    <section id="settings" class="panel" hidden aria-label="Ajustes">
+      <label>
+        Qualidade gráfica
+        <select id="quality">
+          <option value="low">Baixa</option>
+          <option value="medium" selected>Média</option>
+          <option value="high">Alta</option>
+        </select>
+      </label>
+      <label>
+        Direção do sol (azimute)
+        <input id="sun-az" type="range" min="0" max="359" value="235" />
+      </label>
+      <label>
+        Altura do sol
+        <input id="sun-el" type="range" min="8" max="80" value="46" />
+      </label>
+      <label class="check">
+        <input id="night" type="checkbox" />
+        Modo noturno (luminárias e sinalizador)
+      </label>
+    </section>
+
+    <div id="inspect-bar" class="panel" hidden>
+      <label>
+        Componente
+        <select id="component-select"></select>
+      </label>
+      <button id="btn-overview" type="button">Vista geral</button>
+      <button id="btn-cutaway" type="button" aria-pressed="false" title="Remove cobertura e forro para ver o interior de cima">Corte do abrigo</button>
+      <p class="muted">Arraste para girar · roda para zoom · botão direito para deslocar · clique num equipamento para destacá-lo</p>
+    </div>
+
+    <div id="crosshair" hidden aria-hidden="true"></div>
+    <div id="prompt" class="prompt" aria-live="polite" hidden></div>
+    <div id="lockhint" class="lockhint" hidden>Clique na cena para controlar a câmera com o mouse · Esc libera o mouse</div>
+
+    <aside id="info" class="panel info" hidden aria-live="polite">
+      <button id="info-close" class="close" type="button" aria-label="Fechar painel">×</button>
+      <p id="info-cat" class="chip"></p>
+      <h2 id="info-name"></h2>
+      <p id="info-role" class="role"></p>
+      <p id="info-detail"></p>
+      <p id="info-note" class="note"></p>
+    </aside>
+
+    <section id="tour-bar" class="panel tour" hidden aria-label="Apresentação guiada">
+      <div class="tour-text">
+        <h2 id="tour-title"></h2>
+        <p id="tour-text"></p>
+      </div>
+      <div class="tour-progress" aria-hidden="true"><span id="tour-fill"></span></div>
+      <div class="tour-controls">
+        <button id="tour-prev" type="button">Anterior</button>
+        <button id="tour-play" type="button">Pausar</button>
+        <button id="tour-next" type="button">Próximo</button>
+        <button id="tour-restart" type="button">Reiniciar</button>
+        <span id="tour-count" class="muted"></span>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <button id="unhide" class="unhide" type="button" hidden>Mostrar interface (H)</button>
+
+    <div id="help" class="screen modal" role="dialog" aria-modal="true" aria-labelledby="help-title" hidden>
+      <div class="modal-card">
+        <h2 id="help-title">Comandos</h2>
+        <table>
+          <tbody>
+            <tr><th><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / setas</th><td>Andar</td></tr>
+            <tr><th>Mouse</th><td>Olhar ao redor (clique na cena para ativar)</td></tr>
+            <tr><th><kbd>Shift</kbd></th><td>Caminhar mais rápido</td></tr>
+            <tr><th><kbd>E</kbd></th><td>Interagir: abrir o portão ou ver informações do equipamento que está à frente</td></tr>
+            <tr><th><kbd>Esc</kbd></th><td>Liberar o mouse / fechar painéis</td></tr>
+            <tr><th><kbd>R</kbd></th><td>Reiniciar a vista do modo atual (posição inicial, vista geral ou início do percurso)</td></tr>
+            <tr><th><kbd>M</kbd></th><td>Voltar à tela inicial (menu)</td></tr>
+            <tr><th><kbd>F</kbd></th><td>Tela cheia</td></tr>
+            <tr><th><kbd>H</kbd></th><td>Ocultar ou mostrar a interface</td></tr>
+            <tr><th><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></th><td>Visita · Inspeção técnica · Apresentação guiada</td></tr>
+            <tr><th><kbd>Espaço</kbd> <kbd>←</kbd> <kbd>→</kbd></th><td>Na apresentação: pausar, voltar e avançar</td></tr>
+          </tbody>
+        </table>
+        <button id="help-close" class="primary" type="button">Entendi</button>
+      </div>
+    </div>
+
+    <div id="error" class="screen modal" role="alert" hidden>
+      <div class="modal-card">
+        <h2>Não foi possível iniciar a visualização 3D</h2>
+        <p id="error-text"></p>
+        <p class="muted">Experimente atualizar o navegador, ativar a aceleração de hardware ou usar outro navegador.</p>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
