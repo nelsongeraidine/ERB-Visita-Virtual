@@ -4,7 +4,9 @@ Simulação interativa de infraestrutura de telecomunicações: uma visita virtu
 
 > **Aviso:** é uma simulação visual a partir de uma imagem de referência. Posições e dimensões são **estimativas**, exceto a altura indicada de 30 m da torre. Não é projeto executivo de engenharia: não afirma cargas, tensões, potências, azimutes, capacidades nem conformidade normativa.
 
-**Versão:** 0.6.0
+**Demonstração publicada:** https://erb-visita-virtual.vercel.app/
+
+**Versão:** 0.6.1
 
 ## O que tem
 
@@ -82,7 +84,7 @@ src/
 
 ## Publicação
 
-Pensado para Vercel: o projeto Vite é detectado sozinho (comando `npm run build`, saída `dist`). Não há variáveis de ambiente nem backend.
+Publicado no Vercel em https://erb-visita-virtual.vercel.app/. O projeto Vite é detectado sozinho (comando `npm run build`, saída `dist`). Não há variáveis de ambiente nem backend, e cada push em `main` gera uma nova implantação.
 
 ## Licença
 

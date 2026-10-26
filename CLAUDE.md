@@ -1,5 +1,5 @@
 # CLAUDE.md — ERB Visita Virtual 3D
-**Data de Atualização: 26-10-2026_Versão 0.6.0**
+**Data de Atualização: 26-10-2026_Versão 0.6.1**
 
 ## Visão geral
 Projeto de uma aplicação web 3D para apresentar uma Estação Rádio-Base (ERB) de telefonia celular.
@@ -49,4 +49,4 @@ Se uma solicitação entrar em conflito com o PRD, informe o conflito e aguarde 
 - **Verificação:** a página expõe `window.__erb` (mundo, câmera, tour e `verifyTour()`) para testes; `verifyTour()` deve retornar lista vazia.
 - Sob OneDrive, o Vite pode recarregar a página sozinho quando o sync altera o horário dos arquivos; é esperado.
 - **Repositório:** https://github.com/nelsongeraidine/ERB-Visita-Virtual (branch `main`). `dist/`, `node_modules/`, `.env*`, `.vercel` e caches de ferramentas estão no `.gitignore`.
-- **Vercel:** projeto Vite detectado sozinho (build `npm run build`, saída `dist`), sem variáveis de ambiente nem backend. A implantação é feita pelo usuário.
+- **Vercel:** projeto Vite detectado sozinho (build `npm run build`, saída `dist`), sem variáveis de ambiente nem backend. Publicado em https://erb-visita-virtual.vercel.app/ (cada push em `main` reimplanta).

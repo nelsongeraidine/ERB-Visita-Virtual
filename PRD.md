@@ -1,5 +1,5 @@
 # PRD.md — Simulador 3D de Estação Rádio-Base (ERB)
-**Data de Atualização: 26-10-2026_Versão 0.6.0**
+**Data de Atualização: 26-10-2026_Versão 0.6.1**
 
 ## 1. Visão do produto
 Desenvolver uma aplicação web 3D que simule uma estação rádio-base de telefonia celular construída, permitindo uma visita virtual em primeira pessoa e modos complementares para inspeção técnica e apresentação guiada. A imagem em `references/` é a referência visual principal.
@@ -61,7 +61,7 @@ Gestores, equipes de engenharia e operações, clientes e participantes de apres
 - **Dimensões do terreno:** estimativa de ~16 x 11 m. Não há cota total legível na referência.
 - **Interior do abrigo:** fora da primeira entrega; incluído na v0.4.0 como **representação genérica** (decisão de 26-10-2026): só o volume principal é acessível, o anexo segue maciço, e a porta fica aberta até o visitante fechá-la. O banco de baterias entrou como ilustração, sem tecnologia, tensão, capacidade ou autonomia.
 - **Arquivos:** estrutura de `src/` proposta na Fase 1 e `DESIGN.md` aprovados. Em 26-10-2026 o usuário também autorizou o `README.md` e o atalho `Iniciar-ERB-Visita-Virtual.bat`.
-- **Repositório:** https://github.com/nelsongeraidine/ERB-Visita-Virtual (indicado pelo usuário). A implantação no Vercel será feita pelo usuário.
+- **Repositório:** https://github.com/nelsongeraidine/ERB-Visita-Virtual (indicado pelo usuário). Implantação no Vercel feita pelo usuário: https://erb-visita-virtual.vercel.app/
 
 ### 6.2 Dimensões estimadas (não confirmadas)
 Todas ficam em [src/config.ts](src/config.ts). Só a altura da torre (30 m) e o espaçamento de postes (~2 m) vêm da referência.
@@ -85,7 +85,7 @@ Todas ficam em [src/config.ts](src/config.ts). Só a altura da torre (30 m) e o 
 - **Fase 4 — Navegação:** implementada (primeira pessoa, colisões, portão, painéis, câmera orbital).
 - **Fase 5 — Apresentação guiada:** implementada (12 pontos de observação, incluindo o interior do abrigo; pausa, avanço, retorno e reinício).
 - **Fase 6 — Testes e otimização:** parcial; ver seção 10.
-- **Fase 7 — Entrega e publicação:** build local validado; documentação e `README.md` criados; código versionado e enviado ao GitHub. Falta a implantação no Vercel, a cargo do usuário.
+- **Fase 7 — Entrega e publicação:** build local validado; documentação e `README.md` criados; código versionado e enviado ao GitHub; implantado no Vercel e verificado no ar.
 
 ## 8. Pendências atuais
 - [x] Inspecionar a imagem em `references/` e confirmar o nome exato do arquivo.
@@ -98,7 +98,7 @@ Todas ficam em [src/config.ts](src/config.ts). Só a altura da torre (30 m) e o 
 - [ ] Se houver documentação do interior real do abrigo (layout, equipamentos), substituir a representação genérica.
 - [ ] Decidir se o anexo do abrigo também será acessível.
 - [x] Inicializar repositório git e publicar no GitHub.
-- [ ] Implantar no Vercel (a cargo do usuário) e confirmar o endereço publicado.
+- [x] Implantar no Vercel e confirmar o endereço publicado: https://erb-visita-virtual.vercel.app/
 - [ ] Definir a licença do repositório, se houver.
 
 ## 9. Critérios de aceitação
@@ -122,6 +122,12 @@ Todas ficam em [src/config.ts](src/config.ts). Só a altura da torre (30 m) e o 
 - Inspeção do console e tratamento de falhas de WebGL, quando possível.
 
 Só marcar um teste como concluído após executá-lo. Registrar testes não executados e suas limitações.
+
+### 10.5 Verificação da publicação (26-10-2026, https://erb-visita-virtual.vercel.app/)
+- [x] A página carrega por HTTPS sem erros nem avisos no console; título correto; sem tela de erro de WebGL (WebGL 2 ativo no navegador de teste).
+- [x] Só dois arquivos carregados (JS de 189 kB comprimido e CSS de 2 kB), sem pedidos a serviços externos.
+- [x] A visita responde: o visitante anda para dentro do terreno com o portão aberto; o percurso guiado continua sem interseções.
+- [ ] Não verificado no ar: tela cheia, mouse real (PointLock), outras resoluções, outros navegadores e desempenho em GPU real.
 
 ### 10.4 Registro da v0.5.0 (inspeção técnica chega ao interior, mesmo ambiente)
 - [x] Typecheck e build de produção; console sem erros nem avisos.
@@ -186,6 +192,7 @@ Ambiente: Chromium controlado por Playwright, viewport 1440x850, renderização 
 
 ## 12. Histórico de versões
 - **0.1.0 — 26-10-2026:** criação inicial do PRD, escopo preliminar, fases, pendências e critérios de aceitação.
+- **0.6.1 — 26-10-2026:** endereço publicado no Vercel registrado em README, PRD e CLAUDE, com a verificação no ar (seção 10.5).
 - **0.6.0 — 26-10-2026:** publicação: `README.md` criado, documentos atualizados, repositório git inicializado e enviado ao GitHub; `.gitignore` ampliado.
 - **0.5.0 — 26-10-2026:** inspeção técnica chega ao interior do abrigo por um "corte" (cobertura e forro ocultos, câmera de cima); seletor de componentes com grupo "Interior do abrigo"; botão "Corte do abrigo". Sem novos arquivos nem dependências.
 - **0.4.0 — 26-10-2026:** interior do abrigo visitável e genérico (racks, banco de baterias, quadro elétrico, climatização, esteira interna, aterramento); porta articulada com E; patamar e soleira de acesso; passo novo no percurso guiado (12 passos); botão Menu e tecla M para voltar à tela inicial. Novo arquivo `src/scene/shelterInterior.ts`, sem novas dependências.

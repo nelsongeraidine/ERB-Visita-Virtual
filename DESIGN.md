@@ -1,5 +1,5 @@
 # DESIGN.md — ERB Visita Virtual 3D
-**Data de Atualização: 26-10-2026_Versão 0.6.0**
+**Data de Atualização: 26-10-2026_Versão 0.6.1**
 
 ## 1. Direção visual
 Apresentação técnica sóbria: a cena 3D é a protagonista e a interface é discreta. Painéis escuros e translúcidos sobre a imagem, tipografia do sistema, um único destaque âmbar (cor de sinalização) para foco e ação principal. Estação com aspecto de recém-construída, sem exagero de sujeira ou ferrugem. Sem logotipos de operadoras e sem marcas fictícias.
