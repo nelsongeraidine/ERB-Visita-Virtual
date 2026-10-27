@@ -2,7 +2,7 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="Simulação interativa de infraestrutura de telecomunicações: visita virtual 3D a uma estação rádio-base." />
     <title>Estação Rádio-Base — Visita Virtual 3D</title>
     <!-- favicon embutido: evita requisição 404 sem criar arquivo extra -->
@@ -26,7 +26,8 @@
           <button id="btn-inspect" type="button">Inspeção técnica</button>
           <button id="btn-tour" type="button">Apresentação guiada</button>
         </div>
-        <p class="keys-hint"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> ou setas para andar · mouse para olhar · <kbd>E</kbd> para interagir</p>
+        <p class="keys-hint kb"><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> ou setas para andar · mouse para olhar · <kbd>E</kbd> para interagir</p>
+        <p class="keys-hint tc">Joystick à esquerda para andar · arraste à direita para olhar · botão Interagir. Melhor com o celular na horizontal.</p>
         <p class="disclaimer">
           Simulação visual a partir de uma imagem de referência. Posições e dimensões são estimativas, exceto a altura
           indicada de 30 m da torre. Não é projeto executivo de engenharia.
@@ -52,6 +53,7 @@
         <button id="btn-fs" type="button" title="Tela cheia (F)">Tela cheia</button>
         <button id="btn-help" type="button" title="Ajuda com os comandos (?)">Ajuda</button>
         <button id="btn-hide" type="button" title="Ocultar interface (H)">Ocultar</button>
+        <button id="btn-more" type="button" aria-expanded="false" title="Mais opções">Mais</button>
       </div>
     </header>
 
@@ -85,7 +87,17 @@
       </label>
       <button id="btn-overview" type="button">Vista geral</button>
       <button id="btn-cutaway" type="button" aria-pressed="false" title="Remove cobertura e forro para ver o interior de cima">Corte do abrigo</button>
-      <p class="muted">Arraste para girar · roda para zoom · botão direito para deslocar · clique num equipamento para destacá-lo</p>
+      <p class="muted kb">Arraste para girar · roda para zoom · botão direito para deslocar · clique num equipamento para destacá-lo</p>
+      <p class="muted tc">Arraste para girar · pinça para zoom · dois dedos para deslocar · toque num equipamento para destacá-lo</p>
+    </div>
+
+    <!-- Controles de toque da visita (só aparecem em aparelhos de toque) -->
+    <div id="touch-ui" hidden>
+      <div id="stick-zone"></div>
+      <div id="look-zone"></div>
+      <div id="stick-hint" aria-hidden="true"></div>
+      <div id="stick-base" hidden aria-hidden="true"><div id="stick-knob"></div></div>
+      <button id="btn-interact" type="button">Interagir</button>
     </div>
 
     <div id="crosshair" hidden aria-hidden="true"></div>
@@ -124,17 +136,22 @@
         <h2 id="help-title">Comandos</h2>
         <table>
           <tbody>
-            <tr><th><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / setas</th><td>Andar</td></tr>
-            <tr><th>Mouse</th><td>Olhar ao redor (clique na cena para ativar)</td></tr>
-            <tr><th><kbd>Shift</kbd></th><td>Caminhar mais rápido</td></tr>
-            <tr><th><kbd>E</kbd></th><td>Interagir: abrir o portão ou ver informações do equipamento que está à frente</td></tr>
-            <tr><th><kbd>Esc</kbd></th><td>Liberar o mouse / fechar painéis</td></tr>
-            <tr><th><kbd>R</kbd></th><td>Reiniciar a vista do modo atual (posição inicial, vista geral ou início do percurso)</td></tr>
-            <tr><th><kbd>M</kbd></th><td>Voltar à tela inicial (menu)</td></tr>
-            <tr><th><kbd>F</kbd></th><td>Tela cheia</td></tr>
-            <tr><th><kbd>H</kbd></th><td>Ocultar ou mostrar a interface</td></tr>
-            <tr><th><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></th><td>Visita · Inspeção técnica · Apresentação guiada</td></tr>
-            <tr><th><kbd>Espaço</kbd> <kbd>←</kbd> <kbd>→</kbd></th><td>Na apresentação: pausar, voltar e avançar</td></tr>
+            <tr class="kb"><th><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / setas</th><td>Andar</td></tr>
+            <tr class="kb"><th>Mouse</th><td>Olhar ao redor (clique na cena para ativar)</td></tr>
+            <tr class="kb"><th><kbd>Shift</kbd></th><td>Caminhar mais rápido</td></tr>
+            <tr class="kb"><th><kbd>E</kbd></th><td>Interagir: abrir o portão ou ver informações do equipamento que está à frente</td></tr>
+            <tr class="kb"><th><kbd>Esc</kbd></th><td>Liberar o mouse / fechar painéis</td></tr>
+            <tr class="kb"><th><kbd>R</kbd></th><td>Reiniciar a vista do modo atual (posição inicial, vista geral ou início do percurso)</td></tr>
+            <tr class="kb"><th><kbd>M</kbd></th><td>Voltar à tela inicial (menu)</td></tr>
+            <tr class="kb"><th><kbd>F</kbd></th><td>Tela cheia</td></tr>
+            <tr class="kb"><th><kbd>H</kbd></th><td>Ocultar ou mostrar a interface</td></tr>
+            <tr class="kb"><th><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd></th><td>Visita · Inspeção técnica · Apresentação guiada</td></tr>
+            <tr class="kb"><th><kbd>Espaço</kbd> <kbd>←</kbd> <kbd>→</kbd></th><td>Na apresentação: pausar, voltar e avançar</td></tr>
+            <tr class="tc"><th>Joystick (esquerda)</th><td>Andar: encoste o dedo na metade esquerda e arraste</td></tr>
+            <tr class="tc"><th>Arrastar (direita)</th><td>Olhar ao redor; dá para andar e olhar ao mesmo tempo</td></tr>
+            <tr class="tc"><th>Botão Interagir</th><td>Abrir o portão ou a porta, ou ver informações do equipamento que está à frente (mire com o ponto central)</td></tr>
+            <tr class="tc"><th>Barra superior</th><td>Visita, Inspeção e Guiada; em "Mais": reiniciar vista, ajustes, tela cheia, ajuda e ocultar</td></tr>
+            <tr class="tc"><th>Inspeção</th><td>Um dedo gira, pinça dá zoom, dois dedos deslocam, toque seleciona</td></tr>
           </tbody>
         </table>
         <button id="help-close" class="primary" type="button">Entendi</button>

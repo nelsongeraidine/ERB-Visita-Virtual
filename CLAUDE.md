@@ -1,5 +1,5 @@
 # CLAUDE.md — ERB Visita Virtual 3D
-**Data de Atualização: 26-10-2026_Versão 0.6.1**
+**Data de Atualização: 26-10-2026_Versão 0.7.0**
 
 ## Visão geral
 Projeto de uma aplicação web 3D para apresentar uma Estação Rádio-Base (ERB) de telefonia celular.
@@ -23,7 +23,7 @@ Se uma solicitação entrar em conflito com o PRD, informe o conflito e aguarde 
 1. Antes de qualquer mudança não trivial (mais de um arquivo ou alteração de comportamento), apresente um plano e aguarde aprovação.
 2. Não adicione bibliotecas externas, CDNs ou pacotes sem consultar o usuário e receber aprovação.
 3. Escreva comentários em português; explique o **porquê**, não o que o código já evidencia.
-4. Antes de criar qualquer arquivo além dos três principais (`CLAUDE.md`, `PRD.md` e `DESIGN.md`), justifique sua necessidade e aguarde aprovação. Já autorizados pelo usuário: `README.md` e `Iniciar-ERB-Visita-Virtual.bat` (além dos arquivos de configuração do Vite/TypeScript e de `src/`).
+4. Antes de criar qualquer arquivo além dos três principais (`CLAUDE.md`, `PRD.md` e `DESIGN.md`), justifique sua necessidade e aguarde aprovação. Já autorizados pelo usuário: `README.md`, `Iniciar-ERB-Visita-Virtual.bat` e `src/controls/touch.ts` (controles de toque) (além dos arquivos de configuração do Vite/TypeScript e de `src/`).
 5. Se uma solicitação conflitar com `PRD.md`, avise antes de implementar e proponha como resolver.
 6. Registre cada atualização relevante do projeto com data e versão no formato `Data de Atualização: DD-MM-YYYY_Versão X.XX`. Mantenha `PRD.md` atualizado.
 
@@ -43,7 +43,8 @@ Se uma solicitação entrar em conflito com o PRD, informe o conflito e aguarde 
 - `npm run typecheck`: verificação de tipos.
 - `npm run build`: typecheck e build de produção em `dist/`.
 - `npm run preview`: serve o build localmente.
-- **Estrutura:** `src/scene/` (geometria e materiais), `src/controls/` (primeira pessoa, orbital, tour, colisão), `src/ui/` (HUD e estilos), `src/data/` (textos dos equipamentos), `src/config.ts` (layout e dimensões estimadas).
+- **Estrutura:** `src/scene/` (geometria e materiais), `src/controls/` (primeira pessoa, toque, orbital, tour, colisão), `src/ui/` (HUD e estilos), `src/data/` (textos dos equipamentos), `src/config.ts` (layout e dimensões estimadas).
+- **Celular:** `src/controls/touch.ts` (joystick e arrastar para olhar) liga só com `(pointer: coarse)`; o botão "Interagir" substitui a tecla E. Em toque a qualidade inicia em "Baixa".
 - **Teclas úteis:** M volta à tela inicial; R reinicia a vista do modo atual; H oculta a interface.
 - **Interior do abrigo:** `src/scene/shelterInterior.ts` é representação genérica. Não afirmar fabricante, modelo, tensão, capacidade ou autonomia sem fonte.
 - **Verificação:** a página expõe `window.__erb` (mundo, câmera, tour e `verifyTour()`) para testes; `verifyTour()` deve retornar lista vazia.

@@ -9,6 +9,15 @@ export function $<T extends HTMLElement = HTMLElement>(id: string): T {
   return el as T;
 }
 
+/** Aparelho de toque como entrada principal (celular/tablet). Notebook com tela sensível segue com teclado. */
+export const isTouch = window.matchMedia?.('(pointer: coarse)').matches ?? false;
+
+/** `touch` troca dicas e controles; `compact` (toque ou tela estreita) colapsa a barra superior. */
+export function updateDeviceClasses() {
+  document.body.classList.toggle('touch', isTouch);
+  document.body.classList.toggle('compact', isTouch || window.innerWidth <= 760);
+}
+
 const MODE_LABEL: Record<Mode, string> = {
   menu: '',
   visit: 'Visita imersiva',
@@ -27,6 +36,8 @@ export const hud = {
     $('inspect-bar').hidden = mode !== 'inspect';
     $('tour-bar').hidden = mode !== 'tour';
     $('mode-name').textContent = MODE_LABEL[mode];
+    $('touch-ui').hidden = !(isTouch && mode === 'visit');
+    if (mode === 'menu') $('hud').classList.remove('open');
     document.querySelectorAll<HTMLButtonElement>('[data-mode]').forEach((b) => {
       b.setAttribute('aria-pressed', String(b.dataset.mode === mode));
     });
@@ -41,10 +52,14 @@ export const hud = {
     const el = $('prompt');
     el.hidden = !text;
     if (text) el.textContent = text;
+    // no toque o botão "Interagir" faz o papel da tecla E e mostra a ação disponível
+    const btn = $('btn-interact');
+    btn.textContent = text ?? 'Interagir';
+    btn.classList.toggle('ready', !!text);
   },
 
   setLockHint(show: boolean) {
-    $('lockhint').hidden = !show;
+    $('lockhint').hidden = !show || isTouch;
   },
 
   showInfo(info: EquipmentInfo) {

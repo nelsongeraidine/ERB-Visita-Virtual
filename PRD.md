@@ -1,5 +1,5 @@
 # PRD.md — Simulador 3D de Estação Rádio-Base (ERB)
-**Data de Atualização: 26-10-2026_Versão 0.6.1**
+**Data de Atualização: 26-10-2026_Versão 0.7.0**
 
 ## 1. Visão do produto
 Desenvolver uma aplicação web 3D que simule uma estação rádio-base de telefonia celular construída, permitindo uma visita virtual em primeira pessoa e modos complementares para inspeção técnica e apresentação guiada. A imagem em `references/` é a referência visual principal.
@@ -39,6 +39,7 @@ Gestores, equipes de engenharia e operações, clientes e participantes de apres
 - Colisões com cercas, paredes, equipamentos e bases.
 - Interação contextual próxima aos equipamentos para mostrar nome, função geral e categoria.
 - Opção de qualidade gráfica, caso seja necessária para equilibrar fidelidade e desempenho.
+- Celular e tablet (v0.7.0): joystick virtual, arrastar para olhar, botão "Interagir" no lugar da tecla E, barra superior compacta, FOV adaptado ao retrato e qualidade inicial baixa.
 
 ## 5. Fora do escopo inicial
 - Projeto executivo de engenharia ou validação estrutural.
@@ -123,6 +124,15 @@ Todas ficam em [src/config.ts](src/config.ts). Só a altura da torre (30 m) e o 
 
 Só marcar um teste como concluído após executá-lo. Registrar testes não executados e suas limitações.
 
+### 10.6 Registro da v0.7.0 (suporte a toque, emulação no Chromium; não é um celular real)
+- [x] Typecheck e build de produção.
+- [x] Emulação de toque (844x390 e 390x844): detectado como `touch compact`, qualidade inicia em Baixa, barra de uma linha, "Mais" abre os demais botões, toast de "use na horizontal" em retrato, FOV 94° em retrato.
+- [x] Toques sintéticos (CDP): joystick anda a ~2,5 m/s no limite e para ao soltar; segundo dedo gira a câmera com o joystick pressionado; o botão Interagir abre e fecha o portão, muda o rótulo e abre a ficha.
+- [x] Inspeção e Apresentação guiada exibem os layouts compactos sem sobreposição; ficha do equipamento termina acima do botão Interagir.
+- [x] Desktop sem regressão: sem classes de toque, dicas de teclado, qualidade Média, prompt "E · Abrir portão", WASD a ~2 m/s, `verifyTour()` vazio.
+- [ ] Não testado: celular ou tablet reais (sensação do joystick e do arrasto, desempenho de GPU móvel, barra do navegador e entalhe, tela cheia no iPhone, que a API não oferece), pinça e giro com dois dedos na Inspeção em aparelho real, Safari/iOS.
+- [ ] Observado: um aviso de compilação de shader (X4122, precisão do HLSL via ANGLE) apareceu no console durante a emulação; não é erro e não afeta a imagem; origem não investigada.
+
 ### 10.5 Verificação da publicação (26-10-2026, https://erb-visita-virtual.vercel.app/)
 - [x] A página carrega por HTTPS sem erros nem avisos no console; título correto; sem tela de erro de WebGL (WebGL 2 ativo no navegador de teste).
 - [x] Só dois arquivos carregados (JS de 189 kB comprimido e CSS de 2 kB), sem pedidos a serviços externos.
@@ -192,6 +202,7 @@ Ambiente: Chromium controlado por Playwright, viewport 1440x850, renderização 
 
 ## 12. Histórico de versões
 - **0.1.0 — 26-10-2026:** criação inicial do PRD, escopo preliminar, fases, pendências e critérios de aceitação.
+- **0.7.0 — 26-10-2026:** suporte a celular e tablet: controles de toque (novo `src/controls/touch.ts`, sem dependências), botão "Interagir", barra superior compacta com "Mais", ajuda e dicas por tipo de entrada, FOV em retrato e qualidade inicial baixa no toque. Desktop inalterado.
 - **0.6.1 — 26-10-2026:** endereço publicado no Vercel registrado em README, PRD e CLAUDE, com a verificação no ar (seção 10.5).
 - **0.6.0 — 26-10-2026:** publicação: `README.md` criado, documentos atualizados, repositório git inicializado e enviado ao GitHub; `.gitignore` ampliado.
 - **0.5.0 — 26-10-2026:** inspeção técnica chega ao interior do abrigo por um "corte" (cobertura e forro ocultos, câmera de cima); seletor de componentes com grupo "Interior do abrigo"; botão "Corte do abrigo". Sem novos arquivos nem dependências.

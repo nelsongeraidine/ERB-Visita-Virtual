@@ -4,13 +4,15 @@ import { PLAYER_RADIUS } from './config';
 import { FirstPerson } from './controls/firstPerson';
 import { GuidedTour, TOUR_STEPS } from './controls/guidedTour';
 import { InspectionControls } from './controls/orbit';
+import { TouchControls } from './controls/touch';
 import { EQUIPMENT } from './data/equipment';
 import { PostFx } from './scene/postfx';
 import { World } from './scene/world';
-import { $, hud, type Mode } from './ui/hud';
+import { $, hud, isTouch, type Mode, updateDeviceClasses } from './ui/hud';
 
 type QualityKey = 'low' | 'medium' | 'high';
 
+updateDeviceClasses();
 const canvas = $<HTMLCanvasElement>('scene');
 
 function dpr() {
@@ -39,8 +41,17 @@ canvas.addEventListener('webglcontextlost', (e) => {
 
 const camera = new THREE.PerspectiveCamera(62, window.innerWidth / window.innerHeight, 0.1, 3000);
 const timer = new THREE.Timer();
-let quality: QualityKey = 'medium';
+// GPU de celular: começa em "baixa" (o usuário pode subir nos ajustes)
+let quality: QualityKey = isTouch ? 'low' : 'medium';
 let fx: PostFx | undefined;
+
+/** Em retrato o campo de visão horizontal ficaria estreito demais; abre o vertical (até 95°) para compensar. */
+function applyFov() {
+  const aspect = window.innerWidth / window.innerHeight;
+  camera.fov = aspect >= 1 ? 62 : Math.min(95, 62 + (1 - aspect) * 60);
+  camera.aspect = aspect;
+  camera.updateProjectionMatrix();
+}
 
 function applyQuality(q: QualityKey, world?: World) {
   quality = q;
@@ -66,6 +77,8 @@ function boot() {
     hud.showError(`Falha ao montar a cena: ${(err as Error).message}`);
     return;
   }
+  applyFov();
+  $<HTMLSelectElement>('quality').value = quality;
   applyQuality(quality, world);
   try {
     fx = new PostFx(renderer, world.scene, camera);
@@ -79,6 +92,7 @@ function boot() {
   const fp =new FirstPerson(camera, canvas, world.collision);
   const insp = new InspectionControls(camera, canvas);
   const tour = new GuidedTour();
+  const touch = isTouch ? new TouchControls(fp) : null;
   let mode: Mode = 'menu';
   let infoId: string | null = null;
   let tourEnded = false;
@@ -148,7 +162,10 @@ function boot() {
   // --- modos ----------------------------------------------------------------------------------
   function setMode(next: Mode) {
     if (next === mode) return;
-    if (mode === 'visit') fp.disable();
+    if (mode === 'visit') {
+      fp.disable();
+      touch?.reset();
+    }
     if (mode === 'inspect') {
       insp.disable();
       highlight.visible = false;
@@ -165,6 +182,7 @@ function boot() {
       fp.reset();
       fp.enable();
       hud.setLockHint(!fp.locked);
+      if (isTouch && window.innerHeight > window.innerWidth) hud.toast('Dica: use o celular na horizontal');
     } else if (next === 'inspect') {
       insp.controls.target.set(1, 12, -1);
       insp.enable(true);
@@ -180,7 +198,7 @@ function boot() {
   $('btn-visit').addEventListener('click', () => {
     setMode('visit');
     // o clique do botão é um gesto do usuário válido para pedir o bloqueio do mouse
-    void Promise.resolve(canvas.requestPointerLock?.() as unknown).catch(() => {});
+    if (!isTouch) void Promise.resolve(canvas.requestPointerLock?.() as unknown).catch(() => {});
   });
   $('btn-inspect').addEventListener('click', () => setMode('inspect'));
   $('btn-tour').addEventListener('click', () => setMode('tour'));
@@ -249,9 +267,10 @@ function boot() {
   }
 
   function promptFor(id: string): string {
-    if (id === 'gate') return world.gate.target > 0.5 ? 'E · Fechar portão' : 'E · Abrir portão';
-    if (id === 'shelterDoor') return world.door.target > 0.5 ? 'E · Fechar porta do abrigo' : 'E · Abrir porta do abrigo';
-    return `E · ${EQUIPMENT[id].name}`;
+    const key = isTouch ? '' : 'E · '; // no toque o botão "Interagir" dispensa a tecla
+    if (id === 'gate') return key + (world.gate.target > 0.5 ? 'Fechar portão' : 'Abrir portão');
+    if (id === 'shelterDoor') return key + (world.door.target > 0.5 ? 'Fechar porta do abrigo' : 'Abrir porta do abrigo');
+    return key + EQUIPMENT[id].name;
   }
 
   function interact() {
@@ -276,6 +295,8 @@ function boot() {
     if (infoId === id) clearInfo();
     else showInfo(id);
   }
+
+  $('btn-interact').addEventListener('click', interact);
 
   // --- inspeção: clicar para selecionar --------------------------------------------------------------------
   let down: { x: number; y: number } | null = null;
@@ -364,6 +385,20 @@ function boot() {
     }
   }
   $('btn-fs').addEventListener('click', () => void toggleFullscreen());
+  // iPhone não oferece tela cheia por API: melhor sumir com o botão do que mostrar um aviso de erro
+  if (!document.documentElement.requestFullscreen) $('btn-fs').hidden = true;
+
+  // barra compacta: "Mais" abre os botões restantes e qualquer escolha volta a recolhê-los
+  $('btn-more').addEventListener('click', () => {
+    const open = $('hud').classList.toggle('open');
+    $('btn-more').setAttribute('aria-expanded', String(open));
+  });
+  document.querySelectorAll<HTMLButtonElement>('#hud button:not(#btn-more)').forEach((b) =>
+    b.addEventListener('click', () => {
+      $('hud').classList.remove('open');
+      $('btn-more').setAttribute('aria-expanded', 'false');
+    }),
+  );
 
   window.addEventListener('keydown', (e) => {
     const t = e.target as HTMLElement | null;
@@ -421,8 +456,8 @@ function boot() {
   });
 
   window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    updateDeviceClasses();
+    applyFov();
     applyQuality(quality);
   });
 

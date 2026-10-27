@@ -6,7 +6,7 @@ Simulação interativa de infraestrutura de telecomunicações: uma visita virtu
 
 **Demonstração publicada:** https://erb-visita-virtual.vercel.app/
 
-**Versão:** 0.6.1
+**Versão:** 0.7.0
 
 ## O que tem
 
@@ -53,6 +53,19 @@ Outros comandos:
 | Modos | `1` visita, `2` inspeção, `3` apresentação |
 | Apresentação | `Espaço` pausa; `←` e `→` voltam e avançam |
 
+### No celular ou tablet
+
+Detectado por `(pointer: coarse)`; a qualidade gráfica começa em "Baixa". Melhor com o aparelho na horizontal.
+
+| Ação | Gesto |
+|---|---|
+| Andar | joystick flutuante: encoste o dedo na metade esquerda da tela e arraste |
+| Olhar | arraste o dedo na metade direita (dá para andar e olhar ao mesmo tempo) |
+| Interagir, abrir portão ou porta | botão **Interagir** (canto inferior direito; mostra a ação disponível) |
+| Reiniciar vista, ajustes, tela cheia, ajuda, ocultar | botão **Mais** da barra superior |
+| Inspeção técnica | um dedo gira, pinça dá zoom, dois dedos deslocam, toque seleciona |
+| Apresentação | botões da barra inferior |
+
 ## Tecnologia
 
 Vite, TypeScript e Three.js (`three`, `@types/three`, `vite`, `typescript`). Sem React nem bibliotecas de física: colisões 2D com limites verticais, escritas no projeto. Oclusão ambiental (GTAO) opcional, só na qualidade Alta.
@@ -64,7 +77,7 @@ src/
   main.ts            inicialização, modos, interações e laço de render
   config.ts          layout e dimensões estimadas (um único lugar para corrigir)
   scene/             geometria e materiais (site, torre, abrigo, interior, armários, energia, esteira, luz, pós-processamento)
-  controls/          primeira pessoa, câmera orbital, apresentação guiada e colisão
+  controls/          primeira pessoa, toque (joystick), câmera orbital, apresentação guiada e colisão
   ui/                HUD e estilos
   data/              textos dos painéis dos equipamentos
 ```
